@@ -1,7 +1,10 @@
-export interface Employee {
+export interface IEmployee {
   uniqueId: number;
   name: string;
-  subordinates: Employee[];
+  subordinates: IEmployee[];
+  addChild: (child: IEmployee) => any;
+  removeChild: (child: IEmployee) => IEmployee[] | undefined;
+  undoRemoveChild: (child: IEmployee, oldSubordinates: IEmployee[]) => any;
 }
 
 export interface IEmployeeOrgApp {

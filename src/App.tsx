@@ -1,15 +1,10 @@
 import { useMemo, useState } from "react";
+import { Employee } from "./data";
 import { EmployeeOrgApp } from "./EmployeeOrgApp";
-import { Employee } from "./interfaces";
 
 function App() {
-  const ceo: Employee = {
-    uniqueId: 1,
-    name: "Mark Zuckerberg",
-    subordinates: [],
-  };
-
-  let app = useMemo(() => new EmployeeOrgApp(ceo), []);
+  const ceo = useMemo(() => new Employee(1, "Mark Zuckerberg"), []);
+  const app = useMemo(() => new EmployeeOrgApp(ceo), []);
 
   const [employeeId, setEmployeeId] = useState(0);
   const [supervisorId, setSupervisorId] = useState(0);

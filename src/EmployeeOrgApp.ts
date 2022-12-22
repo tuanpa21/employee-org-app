@@ -1,16 +1,16 @@
-import { prepareData } from "./data";
-import { Employee, IEmployeeOrgApp } from "./interfaces";
-import { find, LevelOrderTraversal, Node } from "./tree";
+import { Employee, find, LevelOrderTraversal, prepareData } from "./data";
+import { IEmployeeOrgApp } from "./interfaces";
 
 type Action = {
   employeeId: number;
   from: number;
   to: number;
+  oldSubordinates: Employee[];
 };
 
 export class EmployeeOrgApp implements IEmployeeOrgApp {
   public ceo: Employee;
-  public nodes: Node[];
+  public nodes: Employee[];
   private actionStack: Action[] = [];
   private poppedStack: Action[] = [];
 
@@ -32,7 +32,7 @@ export class EmployeeOrgApp implements IEmployeeOrgApp {
       return;
     }
 
-    this.moveData(action.employeeId, action.from);
+    this.undoMoveData(action);
     this.poppedStack.push(action);
 
     this.printData();
@@ -82,21 +82,41 @@ export class EmployeeOrgApp implements IEmployeeOrgApp {
     const oldSupervisor = findEmployeeResult.parent;
     const newSupervisor = findSupervisorResult.node;
 
-    oldSupervisor.removeChild(employee);
+    const oldSubordinates = oldSupervisor.removeChild(employee);
     newSupervisor.addChild(employee);
 
     return {
-      employeeId: employee.key,
-      from: oldSupervisor.key,
-      to: newSupervisor.key,
+      employeeId: employee.uniqueId,
+      from: oldSupervisor.uniqueId,
+      to: newSupervisor.uniqueId,
+      oldSubordinates: oldSubordinates ?? new Array<Employee>(),
     };
   }
 
-  private handleCurrentNode = (node: Node) => {
-    const data = node.data;
+  private undoMoveData(action: Action): void {
+    const findOldSupervisorResult = find(this.nodes[0], action.from);
+    const findEmployeeResult = find(this.nodes[0], action.employeeId);
+
+    if (
+      findEmployeeResult === undefined ||
+      findOldSupervisorResult === undefined
+    ) {
+      return undefined;
+    }
+
+    const employee = findEmployeeResult.node;
+    const recentSupervisor = findEmployeeResult.parent;
+    const oldSupervisor = findOldSupervisorResult.node;
+
+    const tmp = recentSupervisor.removeChild(employee);
+    console.log(tmp);
+    oldSupervisor.undoRemoveChild(employee, action.oldSubordinates);
+  }
+
+  private handleCurrentNode = (node: Employee) => {
     console.log(
-      `${data.uniqueId} | ${data.name} | Subordinates: ${data.subordinates
-        .map((value) => value.name)
+      `${node.uniqueId} | ${node.name} | Subordinates: ${node.subordinates
+        .map((value) => `${value.name}(${value.uniqueId})`)
         .join(", ")}`
     );
   };
@@ -113,3 +133,4 @@ export class EmployeeOrgApp implements IEmployeeOrgApp {
     this.printData();
   }
 }
+
