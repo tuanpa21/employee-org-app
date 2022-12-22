@@ -1,7 +1,8 @@
 import { prepareData } from "./data";
 import { Employee } from "./Employee";
-import { IEmployeeOrgApp } from "../types";
-import { LevelOrderTraversal, find } from "../utils";
+import { IEmployeeOrgApp } from "./interfaces";
+import { find } from "../utils";
+import { printData } from "../utils";
 
 type Action = {
   employeeId: number;
@@ -12,59 +13,55 @@ type Action = {
 
 export class EmployeeOrgApp implements IEmployeeOrgApp {
   public ceo: Employee;
-  public nodes: Employee[];
-  private actionStack: Action[] = [];
-  private poppedStack: Action[] = [];
+  public employees: Employee[];
+
+  private undoStack: Action[] = [];
+  private redoStack: Action[] = [];
 
   public move(employeeId: number, supervisorId: number): void {
-    const action = this.moveData(employeeId, supervisorId);
+    const action = this.handleMove(employeeId, supervisorId);
 
     if (action !== undefined) {
-      this.actionStack.push(action);
-      this.poppedStack.splice(0); // If add new move, clear all popped stack
+      this.undoStack.push(action);
+      this.redoStack.splice(0); // If add new move, clear all redo stack
 
-      this.printData();
+      printData(this.employees[0]);
     }
   }
 
   public undo(): void {
-    const action = this.actionStack.pop();
+    const action = this.undoStack.pop();
 
     if (action === undefined) {
       return;
     }
 
-    this.undoMoveData(action);
-    this.poppedStack.push(action);
+    this.handleUndo(action);
+    this.redoStack.push(action);
 
-    this.printData();
+    printData(this.employees[0]);
   }
 
   public redo(): void {
-    const action = this.poppedStack.pop();
+    const action = this.redoStack.pop();
 
     if (action === undefined) {
       return;
     }
 
-    this.moveData(action.employeeId, action.to);
-    this.actionStack.push(action);
+    this.handleMove(action.employeeId, action.to);
+    this.undoStack.push(action);
 
-    this.printData();
+    printData(this.employees[0]);
   }
 
-  public printData(): void {
-    console.clear();
-    LevelOrderTraversal(this.nodes[0], this.handleCurrentNode, this.handleEndLevel);
-  }
-
-  private moveData(employeeId: number, supervisorId: number): Action | undefined {
+  private handleMove(employeeId: number, supervisorId: number): Action | undefined {
     if (employeeId === 1) {
       return undefined;
     }
 
-    const findSupervisorResult = find(this.nodes[0], supervisorId);
-    const findEmployeeResult = find(this.nodes[0], employeeId);
+    const findSupervisorResult = find(this.employees[0], supervisorId);
+    const findEmployeeResult = find(this.employees[0], employeeId);
 
     if (findEmployeeResult === undefined || findSupervisorResult === undefined) {
       return undefined;
@@ -85,9 +82,9 @@ export class EmployeeOrgApp implements IEmployeeOrgApp {
     };
   }
 
-  private undoMoveData(action: Action): void {
-    const findOldSupervisorResult = find(this.nodes[0], action.from);
-    const findEmployeeResult = find(this.nodes[0], action.employeeId);
+  private handleUndo(action: Action): void {
+    const findOldSupervisorResult = find(this.employees[0], action.from);
+    const findEmployeeResult = find(this.employees[0], action.employeeId);
 
     if (findEmployeeResult === undefined || findOldSupervisorResult === undefined) {
       return undefined;
@@ -101,21 +98,9 @@ export class EmployeeOrgApp implements IEmployeeOrgApp {
     oldSupervisor.undoRemoveChild(employee, action.oldSubordinates);
   }
 
-  private handleCurrentNode = (node: Employee) => {
-    console.log(
-      `${node.uniqueId} | ${node.name} | Subordinates: ${node.subordinates
-        .map((value) => `${value.name}(${value.uniqueId})`)
-        .join(", ")}`
-    );
-  };
-
-  private handleEndLevel = () => {
-    console.log("--------------------------------------------------------------");
-  };
-
   constructor(ceo: Employee) {
     this.ceo = ceo;
-    this.nodes = prepareData(ceo);
-    this.printData();
+    this.employees = prepareData(ceo);
+    printData(this.employees[0]);
   }
 }

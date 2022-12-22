@@ -1,4 +1,4 @@
-import { IEmployee } from "../types/interfaces";
+import { IEmployee } from "./interfaces";
 
 export class Employee implements IEmployee {
   public uniqueId: number;

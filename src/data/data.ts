@@ -18,8 +18,6 @@ export const prepareData = (ceo: Employee) => {
     new Employee(15, "Sophie Turner")
   ];
 
-  console.log(employees);
-
   employees.unshift(ceo);
   employees.unshift(ceo);
 

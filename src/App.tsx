@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Employee } from "./data/Employee";
 import { EmployeeOrgApp } from "./data";
+import { printData } from "./utils";
 
 function App() {
   const ceo = useMemo(() => new Employee(1, "Mark Zuckerberg"), []);
@@ -23,7 +24,7 @@ function App() {
       <br />
       <button
         onClick={() => {
-          app.printData();
+          printData(app.ceo);
         }}
       >
         Print Data
