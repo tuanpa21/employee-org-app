@@ -1,3 +1,3 @@
 export * from "./Employee";
 export * from "./EmployeeOrgApp";
-export * from "./data";
+export * from "./initial-data";

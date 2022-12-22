@@ -1,4 +1,4 @@
-import { prepareData } from "./data";
+import { prepareData } from "./initial-data";
 import { Employee } from "./Employee";
 import { IEmployeeOrgApp } from "./interfaces";
 import { find } from "../utils";
@@ -57,6 +57,7 @@ export class EmployeeOrgApp implements IEmployeeOrgApp {
 
   private handleMove(employeeId: number, supervisorId: number): Action | undefined {
     if (employeeId === 1) {
+      // If moving CEO, return undefined action
       return undefined;
     }
 
