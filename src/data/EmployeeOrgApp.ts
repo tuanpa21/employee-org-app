@@ -1,5 +1,7 @@
-import { Employee, find, LevelOrderTraversal, prepareData } from "./data";
-import { IEmployeeOrgApp } from "./interfaces";
+import { prepareData } from "./data";
+import { Employee } from "./Employee";
+import { IEmployeeOrgApp } from "../types";
+import { LevelOrderTraversal, find } from "../utils";
 
 type Action = {
   employeeId: number;
@@ -53,17 +55,10 @@ export class EmployeeOrgApp implements IEmployeeOrgApp {
 
   public printData(): void {
     console.clear();
-    LevelOrderTraversal(
-      this.nodes[0],
-      this.handleCurrentNode,
-      this.handleEndLevel
-    );
+    LevelOrderTraversal(this.nodes[0], this.handleCurrentNode, this.handleEndLevel);
   }
 
-  private moveData(
-    employeeId: number,
-    supervisorId: number
-  ): Action | undefined {
+  private moveData(employeeId: number, supervisorId: number): Action | undefined {
     if (employeeId === 1) {
       return undefined;
     }
@@ -71,10 +66,7 @@ export class EmployeeOrgApp implements IEmployeeOrgApp {
     const findSupervisorResult = find(this.nodes[0], supervisorId);
     const findEmployeeResult = find(this.nodes[0], employeeId);
 
-    if (
-      findEmployeeResult === undefined ||
-      findSupervisorResult === undefined
-    ) {
+    if (findEmployeeResult === undefined || findSupervisorResult === undefined) {
       return undefined;
     }
 
@@ -89,7 +81,7 @@ export class EmployeeOrgApp implements IEmployeeOrgApp {
       employeeId: employee.uniqueId,
       from: oldSupervisor.uniqueId,
       to: newSupervisor.uniqueId,
-      oldSubordinates: oldSubordinates ?? new Array<Employee>(),
+      oldSubordinates: oldSubordinates ?? new Array<Employee>()
     };
   }
 
@@ -97,10 +89,7 @@ export class EmployeeOrgApp implements IEmployeeOrgApp {
     const findOldSupervisorResult = find(this.nodes[0], action.from);
     const findEmployeeResult = find(this.nodes[0], action.employeeId);
 
-    if (
-      findEmployeeResult === undefined ||
-      findOldSupervisorResult === undefined
-    ) {
+    if (findEmployeeResult === undefined || findOldSupervisorResult === undefined) {
       return undefined;
     }
 
@@ -108,8 +97,7 @@ export class EmployeeOrgApp implements IEmployeeOrgApp {
     const recentSupervisor = findEmployeeResult.parent;
     const oldSupervisor = findOldSupervisorResult.node;
 
-    const tmp = recentSupervisor.removeChild(employee);
-    console.log(tmp);
+    recentSupervisor.removeChild(employee);
     oldSupervisor.undoRemoveChild(employee, action.oldSubordinates);
   }
 
@@ -122,9 +110,7 @@ export class EmployeeOrgApp implements IEmployeeOrgApp {
   };
 
   private handleEndLevel = () => {
-    console.log(
-      "--------------------------------------------------------------"
-    );
+    console.log("--------------------------------------------------------------");
   };
 
   constructor(ceo: Employee) {
@@ -133,4 +119,3 @@ export class EmployeeOrgApp implements IEmployeeOrgApp {
     this.printData();
   }
 }
-

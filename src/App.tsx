@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { Employee } from "./data";
-import { EmployeeOrgApp } from "./EmployeeOrgApp";
+import { Employee } from "./data/Employee";
+import { EmployeeOrgApp } from "./data";
 
 function App() {
   const ceo = useMemo(() => new Employee(1, "Mark Zuckerberg"), []);
@@ -78,4 +78,3 @@ function App() {
 }
 
 export default App;
-
