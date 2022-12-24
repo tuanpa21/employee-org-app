@@ -2,6 +2,12 @@ import { useMemo, useState } from "react";
 import { Employee } from "./data/Employee";
 import { EmployeeOrgApp } from "./data";
 import { printData } from "./utils";
+import { Tree } from "./components/tree";
+
+const useForceUpdate = () => {
+  const [rerender, setRerender] = useState(false);
+  return () => setRerender(!rerender);
+};
 
 function App() {
   const ceo = useMemo(() => new Employee(1, "Mark Zuckerberg"), []);
@@ -9,6 +15,8 @@ function App() {
 
   const [employeeId, setEmployeeId] = useState(0);
   const [supervisorId, setSupervisorId] = useState(0);
+
+  const forceUpdate = useForceUpdate();
 
   const handleEmployeeIdChange = (e: any) => {
     setEmployeeId(parseInt(e.target.value));
@@ -32,6 +40,7 @@ function App() {
       <button
         onClick={() => {
           app.undo();
+          forceUpdate();
         }}
       >
         Undo
@@ -39,6 +48,7 @@ function App() {
       <button
         onClick={() => {
           app.redo();
+          forceUpdate();
         }}
       >
         Redo
@@ -70,10 +80,12 @@ function App() {
       <button
         onClick={() => {
           app.move(employeeId, supervisorId);
+          forceUpdate();
         }}
       >
         Move
       </button>
+      <Tree root={app.ceo} />
     </>
   );
 }
