@@ -8,7 +8,8 @@ npm run dev
 ```
 
 - After execute above commands, webapp run at `localhost:5173`.
-- Open developer tool (`F12` or `Right-click` > `Inspect`) to watch result in Console tab.
+- You can test the UI, or open developer tool (`F12` or `Right-click` > `Inspect`) to watch result in Console tab.
+- `Employee ID` is used to define employee you want to move and `Supervisor ID` is used to defined his/her new supervisor.
 
 ## Code Details
 
